@@ -15,26 +15,35 @@ from code.helper import prepare_symptoms_array
 import seaborn as sns
 import matplotlib.pyplot as plt
 import joblib
+from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.impute import SimpleImputer
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+
+
 
 # loading the models
 diabetes_model = joblib.load("models/diabetes_model.sav")
-heart_model = joblib.load("models/heart_disease_model.sav")
-parkinson_model = joblib.load("models/parkinsons_model.sav")
+heart_model = pickle.load(open('./Datasets/code/heart_disease.pkl','rb'))
+parkinson_model = pickle.load(open('./Datasets/code/parkinson.pkl','rb'))
 # Load the lung cancer prediction model
-lung_cancer_model = joblib.load('models/lung_cancer_model.sav')
+lung_cancer_model = pickle.load(open('./Datasets/code/lung_cancer.pkl','rb'))
 
 # Load the pre-trained model
-breast_cancer_model = joblib.load('models/breast_cancer.sav')
+breast_cancer_model = pickle.load(open('./Datasets/code/breast_cancer.pkl','rb'))
 
 # Load the pre-trained model
-chronic_disease_model = joblib.load('models/chronic_model.sav')
+chronic_disease_model = pickle.load(open('./Datasets/code/chronic_kidney.pkl','rb'))
 
 # Load the hepatitis prediction model
-hepatitis_model = joblib.load('models/hepititisc_model.sav')
+hepatitis_model = pickle.load(open('./Datasets/code/hepatitisc.pkl','rb'))
 
+# Load the liver cancer prediction model
+liver_model = pickle.load(open('./Datasets/code/liver.pkl','rb'))
 
-liver_model = joblib.load('models/liver_model.sav')# Load the lung cancer prediction model
-lung_cancer_model = joblib.load('models/lung_cancer_model.sav')
+#Load the Covid-19 prediction model
+covid_model = pickle.load(open('./Datasets/code/covid.pkl','rb'))
 
 
 # sidebar
@@ -42,16 +51,17 @@ with st.sidebar:
     selected = option_menu('Multiple Disease Prediction', [
         'Disease Prediction',
         'Diabetes Prediction',
-        'Heart disease Prediction',
+        'Heart Disease Prediction',
         'Parkinson Prediction',
-        'Liver prediction',
-        'Hepatitis prediction',
+        'Liver Prediction',
+        'Covid-19 Prediction',
+        'Hepatitis Prediction',
         'Lung Cancer Prediction',
-        'Chronic Kidney prediction',
+        'Chronic Kidney Prediction',
         'Breast Cancer Prediction',
 
     ],
-        icons=['','activity', 'heart', 'person','person','person','person','bar-chart-fill'],
+        icons=['','activity', 'heart', 'person','person','person','person','person','bar-chart-fill'],
         default_index=0)
 
 
@@ -148,7 +158,7 @@ if selected == 'Diabetes Prediction':  # pagetitle
 
 
 # Heart prediction page
-if selected == 'Heart disease Prediction':
+if selected == 'Heart Disease Prediction':
     st.title("Heart disease prediction")
     image = Image.open('heart2.jpg')
     st.image(image, caption='heart failuire', width = 500)
@@ -453,11 +463,77 @@ if selected == 'Lung Cancer Prediction':
 
         st.success(name + ', ' + cancer_result)
 
+#Covid Prediction Page
+if selected == 'Covid-19 Prediction':
+     st.title("Covid-19 Prediction")
+     image = Image.open('covid.jpg')
+     st.image(image, caption ='Covid Prediction', width = 500)
+
+     #Columns
+     name = st.text_input("Name:")
+     col1, col2, col3 = st.columns(3)
+     
+     with col1:
+      breathing_problem  =  st.selectbox("Breathing Problem:", ['NO', 'YES'])
+     with col2:
+      fever =  st.selectbox("Fever:", ['NO', 'YES'])
+     with col3:
+      dry_cough = st.selectbox("Dry Cough:", ['NO', 'YES'])
+     with col1:
+      sore_throat = st.selectbox("Soar Throat:", ['NO', 'YES'])
+     with col2:
+      running_nose = st.selectbox("Running Nose:", ['NO', 'YES'])
+     with col3:
+      asthma = st.selectbox("Asthma:", ['NO', 'YES']) 
+     with col1:
+      chronic_lung_disease = st.selectbox("Chronic Lung Disease:", ['NO', 'YES'])
+     with col2:
+      headache = st.selectbox("Headache:", ['NO', 'YES'])
+     with col3:
+      heart_disease = st.selectbox("Heart Disease:", ['NO', 'YES'])
+     with col1:
+      diabetes = st.selectbox("Diabetes:", ['NO', 'YES'])
+     with col2:
+      hyper_tension = st.selectbox("Hyper Tension:", ['NO', 'YES'])
+     with col3:
+      fatigue = st.selectbox("Fatigue:", ['NO', 'YES'])
+     with col1:
+      gastrointestinal = st.selectbox("Gastrointestinal:", ['NO', 'YES'])
+     with col2:
+      abroad_travel = st.selectbox("Abroad Travel:", ['NO', 'YES'])
+     with col3:
+      contact_with_COVID_patient = st.selectbox("Contact with COVID Patient:", ['NO', 'YES'])
+     with col1:
+      attended_large_gathering = st.selectbox("Attended Large Gathering:", ['NO', 'YES'])
+     with col2:
+      visited_public_exposed_places = st.selectbox("Visited Public Exposed Places :", ['NO', 'YES'])
+     with col3:
+      family_working_in_public_exposed_places = st.selectbox("Family Working in Public Exposed Places:", ['NO', 'YES'])
+     
+     # Convert inputs
+     def encode_answer(answer):
+         return 1 if answer == "Yes" else 0 
+     user_data = pd.DataFrame({'Breathing Problem': [encode_answer(breathing_problem)],'Fever': [encode_answer(fever)],'Dry Cough': [encode_answer(dry_cough)],'Sore throat': [encode_answer(sore_throat)],'Running Nose': [encode_answer(running_nose)],'Asthma': [encode_answer(asthma)],'Chronic Lung Disease': [encode_answer(chronic_lung_disease)],'Headache': [encode_answer(headache)],'Heart Disease': [encode_answer(heart_disease)],'Diabetes': [encode_answer(diabetes)],'Hyper Tension': [encode_answer(hyper_tension)],'Fatigue ': [encode_answer(fatigue)],'Gastrointestinal ': [encode_answer(gastrointestinal)],'Abroad travel': [encode_answer(abroad_travel)],'Contact with COVID Patient': [encode_answer(contact_with_COVID_patient)],'Attended Large Gathering': [encode_answer(attended_large_gathering)],'Visited Public Exposed Places': [encode_answer(visited_public_exposed_places)],'Family working in Public Exposed Places': [encode_answer(family_working_in_public_exposed_places)]})
+   
+     if st.button("COVID 19 test result"):
+        
+        pred = covid_model.predict(user_data)
+        
+        if pred == 1:
+           covid_diagnosis = 'we are really sorry to say but it seems like you have COVID 19 Disease.'
+           image = Image.open('positive.jpg')
+           st.image(image, caption='')
+        else:
+           covid_diagnosis = "Congratulation , You don't have COVID 19 Disease." 
+           image = Image.open('negative.jpg')
+           st.image(image, caption='')
+        st.success(name + ', ' + covid_diagnosis)
+
 
 
 
 # Liver prediction page
-if selected == 'Liver prediction':  # pagetitle
+if selected == 'Liver Prediction':  # pagetitle
     st.title("Liver disease prediction")
     image = Image.open('liver.jpg')
     st.image(image, caption='Liver disease prediction.', width = 500)
@@ -520,7 +596,7 @@ if selected == 'Liver prediction':  # pagetitle
 
 
 # Hepatitis prediction page
-if selected == 'Hepatitis prediction':
+if selected == 'Hepatitis Prediction':
     st.title("Hepatitis Prediction")
     image = Image.open('h.png')
     st.image(image, caption='Hepatitis Prediction', width = 500)
@@ -567,7 +643,7 @@ if selected == 'Hepatitis prediction':
     if st.button("Predict Hepatitis"):
         # Create a DataFrame with user inputs
         user_data = pd.DataFrame({
-            'Age': [age],
+            'AGE': [age],
             'Sex': [sex],
             'ALB': [total_bilirubin],  # Correct the feature name
             'ALP': [direct_bilirubin],  # Correct the feature name
@@ -606,7 +682,7 @@ if selected == 'Hepatitis prediction':
 
 
 # jaundice prediction page
-if selected == 'Jaundice prediction':  # pagetitle
+if selected == 'Jaundice Prediction':  # pagetitle
     st.title("Jaundice disease prediction")
     image = Image.open('j.jpg')
     st.image(image, caption='Jaundice disease prediction', width = 500)
@@ -675,7 +751,7 @@ import joblib
 
 
 # Chronic Kidney Disease Prediction Page
-if selected == 'Chronic Kidney prediction':
+if selected == 'Chronic Kidney Prediction':
     st.title("Chronic Kidney Disease Prediction")
     # Add the image for Chronic Kidney Disease prediction if needed
     name = st.text_input("Name:")
